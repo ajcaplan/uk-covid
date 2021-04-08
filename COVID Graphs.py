@@ -77,8 +77,6 @@ for i in tqdm(range10):
         pass
 
 print("Adjusting graph appearance...")
-#ax3.xaxis.set_major_locator(mdates.DayLocator(interval=1))
-#plt.rcParams["font.family"] = "Arial"
 plt.xlim(left="01/03/2021", right=dates[::-1][0])
 plt.xticks(rotation='vertical')
 
@@ -90,14 +88,13 @@ plt.title("Recent Averaged Case Rate by Age Group", pad=15)
 plt.axvline(x="08/03/2021", color="black")
 ax3.tick_params(top=True, right=True)
 ax3.legend([i for i in range10], bbox_to_anchor=(1.01, 1))
-#plt.text(0.85, 1.035, credit, transform = ax3.transAxes)
 plt.tight_layout()
 print("Saving...")
-#plt.savefig("Case Rates by Age.pdf")
 pp.savefig()
 print("Completed. Runtime:", datetime.now() - start, "\n")
 
 #################################################################
+
 print("Running admissions by NHS regions")
 start = datetime.now()
 from math import isnan
@@ -136,7 +133,7 @@ for i in sortage:
     index = 0
     for t in sortage[i]:
         if isnan(t):
-            sortage[i][index] = sortage[i][index-1]
+            sortage[i][index] = sortage[i][index-1] # Account for missing data
         index += 1
 
 print("Extracting and ordering dates...")
@@ -149,9 +146,6 @@ for t in dates:
             refmat += j + "/"
         dates[t][dates[t].index(i)] = refmat[:-1]
 
-#for i in dates:
-#    dates[i].sort(key=lambda date: datetime.strptime(date, "%d/%m/%Y"))
-
 print("Plotting...")
 fig, ax = plt.subplots(figsize=(14, 7))
 for i in tqdm(sortage):
@@ -161,9 +155,7 @@ for i in tqdm(sortage):
         print("passing", i)
 
 print("Adjusting graph appearance...")
-#plt.xticks(ticks = dates["London"][::30], labels = dates["London"][::30])
 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-#plt.rcParams["font.family"] = "Arial"
 plt.xlim(left=dates["London"][8], right=dates["London"][-6])
 
 plt.ylim(bottom=0, top=70)
@@ -173,10 +165,8 @@ plt.xticks(rotation='vertical')
 
 plt.title("Hospital Admissions by NHS Region", pad=15)
 ax.tick_params(top=True, right=True)
-#plt.text(0.91, 1.035, credit, transform = ax.transAxes)
 plt.tight_layout()
 print("Saving...")
-#plt.savefig("Hospital Admissions by NHS Region.pdf")
 pp.savefig()
 print("Plotting recent data...")
 fig2, ax2 = plt.subplots(figsize=(13, 7))
@@ -195,9 +185,7 @@ ax2.xaxis.set_major_locator(mdates.DayLocator(interval=1))
 plt.ylim(bottom=0, top=10)
 ax2.legend([i for i in sortage])
 plt.xlim(left=dates["London"][-30], right=dates["London"][-4])
-#plt.text(0.77, 1.002, credit, transform = ax.transAxes)
 plt.tight_layout()
-#plt.savefig("Recent Hospital Admissions by NHS Region.pdf")
 print("Completed. Runtime:", datetime.now() - start, "\n")
 
 pp.savefig()
