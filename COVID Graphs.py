@@ -50,21 +50,6 @@ for i in dates:
         refmat += t + "/"
     dates[dates.index(i)] = refmat[:-1]
 
-"""for i in sortage:
-    sortage[i] = sortage[i][::-1]
-
-fig, ax = plt.subplots()
-for i in sortage:
-    try:
-        ax.plot(dates, sortage[i])
-    except:
-        pass
-
-ax.legend([i for i in sortage], bbox_to_anchor=(1.05, 1))
-ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-plt.ylabel("Rolling Case Rate")
-plt.xticks(rotation='vertical')"""
-
 # Group by 10 years
 print("Grouping data into 10-year ranges...")
 range10 = {}
@@ -93,7 +78,6 @@ for i in tqdm(range10):
 
 print("Adjusting graph appearance...")
 #ax3.xaxis.set_major_locator(mdates.DayLocator(interval=1))
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 #plt.rcParams["font.family"] = "Arial"
 plt.xlim(left="01/03/2021", right=dates[::-1][0])
 plt.xticks(rotation='vertical')
@@ -179,7 +163,6 @@ for i in tqdm(sortage):
 print("Adjusting graph appearance...")
 #plt.xticks(ticks = dates["London"][::30], labels = dates["London"][::30])
 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 #plt.rcParams["font.family"] = "Arial"
 plt.xlim(left=dates["London"][8], right=dates["London"][-6])
 
@@ -212,7 +195,6 @@ ax2.xaxis.set_major_locator(mdates.DayLocator(interval=1))
 plt.ylim(bottom=0, top=10)
 ax2.legend([i for i in sortage])
 plt.xlim(left=dates["London"][-30], right=dates["London"][-4])
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 #plt.text(0.77, 1.002, credit, transform = ax.transAxes)
 plt.tight_layout()
 #plt.savefig("Recent Hospital Admissions by NHS Region.pdf")
