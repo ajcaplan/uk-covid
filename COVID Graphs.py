@@ -12,6 +12,7 @@ pp = PdfPages('COVID-19 Graphs.pdf')
 
 print("\nGetting data from api.coronavirus.data.gov.uk...")
 data = read_csv("https://api.coronavirus.data.gov.uk/v2/data?areaType=overview&metric=newCasesBySpecimenDateAgeDemographics&format=csv").values.tolist()
+data = sorted(data, key = lambda row: datetime.strptime(row[0], "%Y-%m-%d"), reverse=True)
 
 # Get the different age ranges used in the data
 print("Getting age range...")
@@ -50,6 +51,21 @@ for i in dates:
         refmat += t + "/"
     dates[dates.index(i)] = refmat[:-1]
 
+"""for i in sortage:
+    sortage[i] = sortage[i][::-1]
+
+fig, ax = plt.subplots()
+for i in sortage:
+    try:
+        ax.plot(dates, sortage[i])
+    except:
+        pass
+
+ax.legend([i for i in sortage], bbox_to_anchor=(1.05, 1))
+ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+plt.ylabel("Rolling Case Rate")
+plt.xticks(rotation='vertical')"""
+
 # Group by 10 years
 print("Grouping data into 10-year ranges...")
 range10 = {}
@@ -77,6 +93,9 @@ for i in tqdm(range10):
         pass
 
 print("Adjusting graph appearance...")
+#ax3.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#plt.rcParams["font.family"] = "Arial"
 plt.xlim(left="01/03/2021", right=dates[::-1][0])
 plt.xticks(rotation='vertical')
 
@@ -88,13 +107,14 @@ plt.title("Recent Averaged Case Rate by Age Group", pad=15)
 plt.axvline(x="08/03/2021", color="black")
 ax3.tick_params(top=True, right=True)
 ax3.legend([i for i in range10], bbox_to_anchor=(1.01, 1))
+#plt.text(0.85, 1.035, credit, transform = ax3.transAxes)
 plt.tight_layout()
 print("Saving...")
+#plt.savefig("Case Rates by Age.pdf")
 pp.savefig()
 print("Completed. Runtime:", datetime.now() - start, "\n")
 
 #################################################################
-
 print("Running admissions by NHS regions")
 start = datetime.now()
 from math import isnan
@@ -102,6 +122,7 @@ from math import isnan
 print("\nGetting data from api.coronavirus.data.gov.uk...")
 data = read_csv("https://api.coronavirus.data.gov.uk/v2/data?areaType=nhsRegion&metric=hospitalCases&metric=newAdmissionsRollingRate&format=csv").values.tolist()
 data = sorted(data, key = lambda row: datetime.strptime(row[0], "%Y-%m-%d"), reverse=True)
+
 # Get the different age ranges used in the data
 print("Getting trust names...")
 trusts = []
@@ -133,10 +154,10 @@ for i in sortage:
     index = 0
     for t in sortage[i]:
         if isnan(t):
-            sortage[i][index] = sortage[i][index-1] # Account for missing data
+            sortage[i][index] = sortage[i][index-1]
         index += 1
 
-print("Extracting and ordering dates...")
+print("Extracting dates...")
 for t in dates:
     dates[t] = dates[t][::-1]
     for i in dates[t]:
@@ -149,14 +170,17 @@ for t in dates:
 print("Plotting...")
 fig, ax = plt.subplots(figsize=(14, 7))
 for i in tqdm(sortage):
-    try:
-        ax.plot(dates[i][8:], sortage[i][8:])
-    except:
-        print("passing", i)
+    if i != "North East and Yorkshire":
+        ax.plot(dates[i][6:], sortage[i][6:])
+    else:
+        ax.plot(dates[i][5:], sortage[i][5:])
 
 print("Adjusting graph appearance...")
+#plt.xticks(ticks = dates["London"][::30], labels = dates["London"][::30])
 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-plt.xlim(left=dates["London"][8], right=dates["London"][-6])
+#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#plt.rcParams["font.family"] = "Arial"
+plt.xlim(left=dates["London"][6], right=dates["London"][-6])
 
 plt.ylim(bottom=0, top=70)
 ax.legend([i for i in sortage], bbox_to_anchor=(1.225, 1))
@@ -165,8 +189,10 @@ plt.xticks(rotation='vertical')
 
 plt.title("Hospital Admissions by NHS Region", pad=15)
 ax.tick_params(top=True, right=True)
+#plt.text(0.91, 1.035, credit, transform = ax.transAxes)
 plt.tight_layout()
 print("Saving...")
+#plt.savefig("Hospital Admissions by NHS Region.pdf")
 pp.savefig()
 print("Plotting recent data...")
 fig2, ax2 = plt.subplots(figsize=(13, 7))
@@ -185,8 +211,11 @@ ax2.xaxis.set_major_locator(mdates.DayLocator(interval=1))
 plt.ylim(bottom=0, top=10)
 ax2.legend([i for i in sortage])
 plt.xlim(left=dates["London"][-30], right=dates["London"][-4])
+#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#plt.text(0.77, 1.002, credit, transform = ax.transAxes)
 plt.tight_layout()
-print("Completed. Runtime:", datetime.now() - start, "\n")
-
+#plt.savefig("Recent Hospital Admissions by NHS Region.pdf")
+print("Saving...")
 pp.savefig()
+print("Completed. Runtime:", datetime.now() - start, "\n")
 pp.close()
