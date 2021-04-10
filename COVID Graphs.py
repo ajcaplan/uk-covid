@@ -37,7 +37,7 @@ for i in data[:len(data)-1]:
             pass
         
 # Generate date axis
-print("Extracting dates...")
+print("Extracting and formatting dates...")
 dates = []
 for i in data[::len(ages)-1]:
     if i[0] not in dates:
@@ -87,15 +87,10 @@ for i in range10:
 print("Plotting...")
 fig3, ax3 = plt.subplots(figsize=(13, 7))
 for i in tqdm(range10):
-    try:
-        ax3.plot(dates, range10[i])
-    except:
-        pass
+    ax3.plot(dates, range10[i])
 
 print("Adjusting graph appearance...")
-#ax3.xaxis.set_major_locator(mdates.DayLocator(interval=1))
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-#plt.rcParams["font.family"] = "Arial"
+ax3.xaxis.set_major_locator(mdates.DayLocator(interval=2))
 plt.xlim(left="01/03/2021", right=dates[::-1][0])
 plt.xticks(rotation='vertical')
 
@@ -110,11 +105,11 @@ ax3.legend([i for i in range10], bbox_to_anchor=(1.01, 1))
 #plt.text(0.85, 1.035, credit, transform = ax3.transAxes)
 plt.tight_layout()
 print("Saving...")
-#plt.savefig("Case Rates by Age.pdf")
 pp.savefig()
 print("Completed. Runtime:", datetime.now() - start, "\n")
 
 #################################################################
+
 print("Running admissions by NHS regions")
 start = datetime.now()
 from math import isnan
@@ -148,18 +143,18 @@ for i in data[:len(data)-1]:
                     dates[t].append(i[0])
         except:
             pass
-        
+print("Cleaning and formatting data...")
 for i in sortage:
     sortage[i] = sortage[i][::-1]
+    dates[i] = dates[i][::-1]
     index = 0
     for t in sortage[i]:
         if isnan(t):
-            sortage[i][index] = sortage[i][index-1]
+            sortage[i] = sortage[i][0:index]
+            dates[i] = dates[i][0:index]
         index += 1
 
-print("Extracting dates...")
 for t in dates:
-    dates[t] = dates[t][::-1]
     for i in dates[t]:
         tmp = i.split("-")[::-1]
         refmat = ""
@@ -167,20 +162,19 @@ for t in dates:
             refmat += j + "/"
         dates[t][dates[t].index(i)] = refmat[:-1]
 
+for i in dates: # Equalise lengths of lists
+    index = dates[i].index("20/03/2020")
+    dates[i] = dates[i][index:]
+    sortage[i] = sortage[i][index:]
+
 print("Plotting...")
 fig, ax = plt.subplots(figsize=(14, 7))
 for i in tqdm(sortage):
-    if i != "North East and Yorkshire":
-        ax.plot(dates[i][6:], sortage[i][6:])
-    else:
-        ax.plot(dates[i][5:], sortage[i][5:])
+    ax.plot(dates[i][5:], sortage[i][5:])
 
 print("Adjusting graph appearance...")
-#plt.xticks(ticks = dates["London"][::30], labels = dates["London"][::30])
 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-#plt.rcParams["font.family"] = "Arial"
-plt.xlim(left=dates["London"][6], right=dates["London"][-6])
+plt.xlim(left = dates["London"][5], right = dates["London"][-1])
 
 plt.ylim(bottom=0, top=70)
 ax.legend([i for i in sortage], bbox_to_anchor=(1.225, 1))
@@ -189,16 +183,14 @@ plt.xticks(rotation='vertical')
 
 plt.title("Hospital Admissions by NHS Region", pad=15)
 ax.tick_params(top=True, right=True)
-#plt.text(0.91, 1.035, credit, transform = ax.transAxes)
 plt.tight_layout()
 print("Saving...")
-#plt.savefig("Hospital Admissions by NHS Region.pdf")
 pp.savefig()
 print("Plotting recent data...")
 fig2, ax2 = plt.subplots(figsize=(13, 7))
 for i in tqdm(sortage):
     try:
-        ax2.plot(dates[i][-30:-3], sortage[i][-30:-3])
+        ax2.plot(dates[i][-31:], sortage[i][-31:])
     except:
         print("passing", i)
 
@@ -207,14 +199,12 @@ plt.title("Recent Hospital Admissions by NHS Region", pad=15)
 plt.ylabel("Rolling Rate")
 ax2.tick_params(top=True, right=True)
 plt.xticks(rotation='vertical')
-ax2.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=2))
 plt.ylim(bottom=0, top=10)
 ax2.legend([i for i in sortage])
-plt.xlim(left=dates["London"][-30], right=dates["London"][-4])
-#credit = "Created by Adam Caplan, " + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-#plt.text(0.77, 1.002, credit, transform = ax.transAxes)
+plt.xlim(left = dates["London"][-31], right = dates["London"][-1])
 plt.tight_layout()
-#plt.savefig("Recent Hospital Admissions by NHS Region.pdf")
+
 print("Saving...")
 pp.savefig()
 print("Completed. Runtime:", datetime.now() - start, "\n")
