@@ -69,7 +69,7 @@ for i in range10:
     range10[i] = range10[i][::-1]
 
 print("Plotting...")
-fig3, ax5 = plt.subplots(figsize=(13, 7))
+fig3, ax5 = plt.subplots(figsize=(14, 7))
 for i in tqdm(range10):
     ax5.plot(dates, range10[i])
 ax5.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
@@ -77,8 +77,9 @@ plt.ylim(bottom = 0, top = 1000)
 plt.xlim(left = "01/03/2020", right = dates[-1])
 plt.title("Case Rate by Age Group", pad=15)
 plt.grid(axis="y", alpha=0.4)
+plt.ylabel("Rolling Rate")
 ax5.tick_params(top=True, right=True)
-ax5.legend([i for i in range10], bbox_to_anchor=(1.11, 1))
+ax5.legend([i for i in range10])# bbox_to_anchor=(1.11, 1))
 plt.xticks(rotation='vertical')
 plt.tight_layout()
 print("Saving...")
@@ -86,11 +87,13 @@ pp.savefig()
 print("Completed.\n")
 
 print("Plotting recent data...")
-fig3, ax3 = plt.subplots(figsize=(13, 7))
+fig3, ax3 = plt.subplots(figsize=(14, 7))
 for i in tqdm(range10):
     ax3.plot(dates[-30:], range10[i][-30:])
 
 print("Adjusting graph appearance...")
+#ax3.xaxis.set_major_locator(mdates.DayLocator(interval=2))
+#plt.rcParams["font.family"] = "Arial"
 plt.xlim(left=dates[-30], right=dates[::-1][0])
 plt.xticks(rotation='vertical')
 
@@ -101,7 +104,7 @@ plt.yticks(np.arange(0, 101, 10))
 plt.title("Recent Case Rate by Age Group", pad=15)
 plt.grid(axis="y", alpha=0.4)
 ax3.tick_params(top=True, right=True)
-ax3.legend([i for i in range10], bbox_to_anchor=(1.11, 1))
+ax3.legend([i for i in range10])#, bbox_to_anchor=(1.11, 1))
 plt.tight_layout()
 print("Saving...")
 pp.savefig()
@@ -139,13 +142,11 @@ for i in data[:len(data)-1]:
                     dates[t].append(i[3])
         except:
             pass
-print(dates["London"][-1])
+
 print("Cleaning and formatting data...")
 for i in sortage:
-    print("\n", i)
     index = 0
     for t in sortage[i][0:10]:
-        print(t, "t", index)
         if isnan(t):
             sortage[i] = sortage[i][index+1:]
             dates[i] = dates[i][index+1:]
@@ -153,7 +154,6 @@ for i in sortage:
     sortage[i] = sortage[i][::-1]
     dates[i] = dates[i][::-1]
     
-print(dates["London"])
 for t in dates:
     for i in dates[t]:
         tmp = i.split("-")[::-1]
@@ -161,7 +161,6 @@ for t in dates:
         for j in tmp:
             refmat += j + "/"
         dates[t][dates[t].index(i)] = refmat[:-1]
-print(dates["London"])
 
 for i in dates: # Equalise lengths of lists
     index = dates[i].index("25/03/2020")
@@ -174,11 +173,13 @@ for i in tqdm(sortage):
     ax.plot(dates[i][0:], sortage[i][0:])
 
 print("Adjusting graph appearance...")
+#plt.xticks(ticks = dates["London"][::30], labels = dates["London"][::30])
 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+#plt.rcParams["font.family"] = "Arial"
 plt.xlim(left = dates["London"][0], right = dates["London"][-1])
 
 plt.ylim(bottom=0, top=70)
-ax.legend([i for i in sortage], bbox_to_anchor=(1.225, 1))
+ax.legend([i for i in sortage])#, bbox_to_anchor=(1.225, 1))
 plt.ylabel("Rolling Rate")
 plt.xticks(rotation='vertical')
 
@@ -189,7 +190,7 @@ plt.tight_layout()
 print("Saving...")
 pp.savefig()
 print("Plotting recent data...")
-fig2, ax2 = plt.subplots(figsize=(13, 7))
+fig2, ax2 = plt.subplots(figsize=(14, 7))
 for i in tqdm(sortage):
     try:
         ax2.plot(dates[i][-30:], sortage[i][-30:])
@@ -202,6 +203,7 @@ plt.grid(axis="y", alpha=0.4)
 plt.ylabel("Rolling Rate")
 ax2.tick_params(top=True, right=True)
 plt.xticks(rotation='vertical')
+#ax2.xaxis.set_major_locator(mdates.DayLocator(interval=2))
 plt.ylim(bottom=0, top=10)
 ax2.legend([i for i in sortage])
 plt.xlim(left = dates["London"][-30], right = dates["London"][-1])
@@ -274,13 +276,14 @@ for i in tqdm(sortage):
 
 print("Adjusting graph appearance...")
 plt.xticks(ticks = dates["London"][::2], labels = dates["London"][::2])
+#ax4.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
 plt.xlim(left = dates["London"][0], right = dates["London"][-1])
 plt.ylabel("Transmission rate")
 plt.xticks(rotation='vertical')
 plt.ylim(bottom = absmin - 0.1, top = absmax + 0.1)
 plt.yticks(np.arange(absmin - 0.1, absmax + 0.15, 0.2))
 
-ax4.legend([i for i in sortage], bbox_to_anchor=(1.225, 1))
+ax4.legend([i for i in sortage])#, bbox_to_anchor=(1.225, 1))
 plt.hlines(1.0, dates["London"][0], dates["London"][-1], colors = "black", linestyles = "dotted")
 plt.title("Transmission Rates by NHS Region", pad=15)
 plt.grid(axis="y", alpha=0.4)
